@@ -3,9 +3,11 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.database import Base, engine
-from app.routers import graph, people, relationships
+from app.routers import graph, people, relationships, uploads
+from app.routers.uploads import UPLOAD_DIR
 
 load_dotenv()
 
@@ -26,6 +28,8 @@ app.add_middleware(
 app.include_router(people.router)
 app.include_router(relationships.router)
 app.include_router(graph.router)
+app.include_router(uploads.router)
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 
 @app.get("/")

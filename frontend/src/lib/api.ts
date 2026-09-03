@@ -31,4 +31,14 @@ export const api = {
     request<void>('/relationships', { method: 'POST', body: JSON.stringify(data) }),
   deleteRelationship: (id: number) => request<void>(`/relationships/${id}`, { method: 'DELETE' }),
   getRelatives: (personId: number) => request<RelativesResponse>(`/people/${personId}/relatives`),
+  uploadPhoto: async (file: File): Promise<{ url: string }> => {
+    const formData = new FormData()
+    formData.append('file', file)
+    const res = await fetch(`${API_URL}/upload/photo`, { method: 'POST', body: formData })
+    if (!res.ok) {
+      const body = await res.json().catch(() => null)
+      throw new Error(body?.detail ?? `업로드 실패: ${res.status}`)
+    }
+    return res.json()
+  },
 }

@@ -1,5 +1,5 @@
-import { useState, type FormEvent } from 'react'
-import { Plus } from 'lucide-react'
+import { useRef, useState, type ChangeEvent, type FormEvent } from 'react'
+import { Plus, Upload, User } from 'lucide-react'
 
 import { api } from '@/lib/api'
 import type { Gender } from '@/lib/types'
@@ -29,6 +29,8 @@ export function AddPersonDialog({ onCreated }: Props) {
   const [photoUrl, setPhotoUrl] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   function resetForm() {
     setName('')
@@ -37,6 +39,22 @@ export function AddPersonDialog({ onCreated }: Props) {
     setDeathDate('')
     setPhotoUrl('')
     setError(null)
+  }
+
+  async function handleFileSelect(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setUploading(true)
+    setError(null)
+    try {
+      const { url } = await api.uploadPhoto(file)
+      setPhotoUrl(url)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '사진 업로드에 실패했습니다')
+    } finally {
+      setUploading(false)
+    }
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -112,17 +130,42 @@ export function AddPersonDialog({ onCreated }: Props) {
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="photo">사진 URL</Label>
+            <Label>얼굴 사진</Label>
+            <div className="flex items-center gap-3">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted">
+                {photoUrl ? (
+                  <img src={photoUrl} alt="미리보기" className="h-full w-full object-cover" />
+                ) : (
+                  <User className="h-6 w-6 text-muted-foreground" />
+                )}
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={uploading}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload className="h-4 w-4" />
+                {uploading ? '업로드 중...' : '사진 선택'}
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                className="hidden"
+                onChange={handleFileSelect}
+              />
+            </div>
             <Input
-              id="photo"
-              placeholder="https://..."
+              placeholder="또는 이미지 URL 직접 입력"
               value={photoUrl}
               onChange={(e) => setPhotoUrl(e.target.value)}
             />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
           <DialogFooter>
-            <Button type="submit" disabled={submitting}>
+            <Button type="submit" disabled={submitting || uploading}>
               추가
             </Button>
           </DialogFooter>

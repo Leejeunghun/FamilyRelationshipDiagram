@@ -35,6 +35,8 @@ npm run dev
 ```
 
 - http://localhost:5173 에서 확인. `VITE_API_URL` 환경변수(기본 `.env` 참고)로 백엔드 주소를 지정한다.
+- "사람 추가" 폼에서 얼굴 사진 파일(jpg/png/webp/gif, 5MB 이하)을 선택하면 백엔드
+  `POST /upload/photo`로 업로드되고, 반환된 URL이 `photo_url`로 저장된다.
 
 ## 배포 (기획서 4~5단계, 계정 필요 — 직접 진행)
 
@@ -43,6 +45,9 @@ npm run dev
   `CORS_ORIGINS`(GitHub Pages 도메인)를 설정한다.
 - **DB → Supabase**: 프로젝트 생성 후 Connection string을 `DATABASE_URL`에 사용. 1주일간
   미접속 시 자동 일시정지되니 참고.
+- **업로드된 사진 주의**: 사진은 현재 `backend/uploads/`에 로컬 파일로 저장된다. Render Free
+  Web Service는 디스크가 영구 저장되지 않아 재배포/재시작 시 업로드된 사진이 모두 사라진다.
+  실제로 운영하려면 Supabase Storage 등 별도 오브젝트 스토리지 연동이 필요하다(향후 확장 과제).
 - **프론트엔드 → GitHub Pages**: `frontend/vite.config.ts`에 `base: '/<저장소이름>/'`를 추가한 뒤
   `npm run build`로 나온 `dist/`를 GitHub Pages에 배포 (GitHub Actions 워크플로 구성 필요).
   배포 전 `frontend/.env.production`에 Render 백엔드 URL을 `VITE_API_URL`로 지정한다.
