@@ -5,6 +5,7 @@ import type { Person } from '@/lib/types'
 import { AddPersonDialog } from '@/components/AddPersonDialog'
 import { AddRelationshipDialog } from '@/components/AddRelationshipDialog'
 import { FamilyGraph } from '@/components/FamilyGraph'
+import { OwnerIdDialog } from '@/components/OwnerIdDialog'
 import { PersonDetailsPanel } from '@/components/PersonDetailsPanel'
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
       <header className="flex items-center justify-between border-b px-4 py-3">
         <h1 className="text-lg font-semibold">가족관계도</h1>
         <div className="flex gap-2">
+          <OwnerIdDialog />
           <AddRelationshipDialog people={people} onCreated={refresh} />
           <AddPersonDialog onCreated={refresh} />
         </div>

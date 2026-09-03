@@ -10,13 +10,13 @@ from app import crud, models
 class FamilyGraph:
     """전체 Person/Relationship을 한 번 읽어 메모리 상의 인접 리스트로 구성."""
 
-    def __init__(self, db: Session):
-        self.people: dict[int, models.Person] = {p.id: p for p in crud.get_people(db)}
+    def __init__(self, db: Session, owner_id: str):
+        self.people: dict[int, models.Person] = {p.id: p for p in crud.get_people(db, owner_id)}
         self.parents_of: dict[int, set[int]] = defaultdict(set)
         self.children_of: dict[int, set[int]] = defaultdict(set)
         self.spouses_of: dict[int, set[int]] = defaultdict(set)
 
-        for rel in crud.get_relationships(db):
+        for rel in crud.get_relationships(db, owner_id):
             if rel.type == models.RelationType.parent_child:
                 self.parents_of[rel.person_b_id].add(rel.person_a_id)
                 self.children_of[rel.person_a_id].add(rel.person_b_id)

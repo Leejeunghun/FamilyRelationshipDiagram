@@ -5,12 +5,13 @@ import type {
   RelationshipInput,
   RelativesResponse,
 } from './types'
+import { getOwnerId } from './ownerId'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'X-Owner-Id': getOwnerId() },
     ...options,
   })
   if (!res.ok) {

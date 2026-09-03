@@ -18,7 +18,7 @@ cd backend
 python -m venv .venv
 ./.venv/Scripts/activate       # Windows (PowerShell: .venv\Scripts\Activate.ps1)
 pip install -r requirements.txt
-python seed.py                 # 샘플 3세대 가족 데이터 채우기 (선택)
+python seed.py                 # 샘플 3세대 가족 데이터 채우기 (선택, owner_id="seed-demo"로 생성됨)
 uvicorn app.main:app --reload --port 8000
 ```
 
@@ -37,6 +37,11 @@ npm run dev
 - http://localhost:5173 에서 확인. `VITE_API_URL` 환경변수(기본 `.env` 참고)로 백엔드 주소를 지정한다.
 - "사람 추가" 폼에서 얼굴 사진 파일(jpg/png/webp/gif, 5MB 이하)을 선택하면 백엔드
   `POST /upload/photo`로 업로드되고, 반환된 URL이 `photo_url`로 저장된다.
+- **로그인 없는 데이터 구분**: 회원가입 없이도 각자 다른 가족관계도를 보게 하기 위해,
+  브라우저에 처음 접속하면 임의의 ID(`localStorage`)가 발급되고 모든 API 요청에
+  `X-Owner-Id` 헤더로 실려서 그 ID의 데이터만 조회/수정된다. 우측 상단 "내 ID" 버튼에서
+  이 값을 확인/복사하거나, 다른 사람에게 받은 ID로 전환해 같은 가족관계도를 공유할 수 있다.
+  단, 진짜 로그인이 아니라 값을 아는 사람은 누구나 접근 가능한 수준의 구분이다.
 
 ## 배포 (기획서 4~5단계, 계정 필요 — 직접 진행)
 

@@ -8,22 +8,24 @@ from app.database import Base, SessionLocal, engine
 
 Base.metadata.create_all(bind=engine)
 
+SEED_OWNER_ID = "seed-demo"
+
 db = SessionLocal()
 
 try:
-    if db.query(models.Person).count() > 0:
-        print("이미 데이터가 존재합니다. 초기화하려면 family_tree.db 파일을 삭제하세요.")
+    if db.query(models.Person).filter(models.Person.owner_id == SEED_OWNER_ID).count() > 0:
+        print("이미 시드 데이터가 존재합니다. 초기화하려면 family_tree.db 파일을 삭제하세요.")
     else:
         people = {
-            "조부": models.Person(name="김할아버지", gender=models.Gender.male),
-            "조모": models.Person(name="이할머니", gender=models.Gender.female),
-            "부": models.Person(name="김아버지", gender=models.Gender.male),
-            "모": models.Person(name="박어머니", gender=models.Gender.female),
-            "삼촌": models.Person(name="김삼촌", gender=models.Gender.male),
-            "숙모": models.Person(name="최숙모", gender=models.Gender.female),
-            "나": models.Person(name="김나", gender=models.Gender.unknown),
-            "동생": models.Person(name="김동생", gender=models.Gender.unknown),
-            "사촌": models.Person(name="김사촌", gender=models.Gender.unknown),
+            "조부": models.Person(owner_id=SEED_OWNER_ID, name="김할아버지", gender=models.Gender.male),
+            "조모": models.Person(owner_id=SEED_OWNER_ID, name="이할머니", gender=models.Gender.female),
+            "부": models.Person(owner_id=SEED_OWNER_ID, name="김아버지", gender=models.Gender.male),
+            "모": models.Person(owner_id=SEED_OWNER_ID, name="박어머니", gender=models.Gender.female),
+            "삼촌": models.Person(owner_id=SEED_OWNER_ID, name="김삼촌", gender=models.Gender.male),
+            "숙모": models.Person(owner_id=SEED_OWNER_ID, name="최숙모", gender=models.Gender.female),
+            "나": models.Person(owner_id=SEED_OWNER_ID, name="김나", gender=models.Gender.unknown),
+            "동생": models.Person(owner_id=SEED_OWNER_ID, name="김동생", gender=models.Gender.unknown),
+            "사촌": models.Person(owner_id=SEED_OWNER_ID, name="김사촌", gender=models.Gender.unknown),
         }
         db.add_all(people.values())
         db.commit()
@@ -33,6 +35,7 @@ try:
         def pc(parent_key, child_key):
             db.add(
                 models.Relationship(
+                    owner_id=SEED_OWNER_ID,
                     type=models.RelationType.parent_child,
                     person_a_id=people[parent_key].id,
                     person_b_id=people[child_key].id,
@@ -42,6 +45,7 @@ try:
         def sp(a_key, b_key):
             db.add(
                 models.Relationship(
+                    owner_id=SEED_OWNER_ID,
                     type=models.RelationType.spouse,
                     person_a_id=people[a_key].id,
                     person_b_id=people[b_key].id,
