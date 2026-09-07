@@ -47,3 +47,8 @@ export interface RelativesResponse {
   descendants: Person[]
   cousins: Person[]
 }
+
+export interface KinshipTerm {
+  person: Person
+  term: string
+}

@@ -5,6 +5,8 @@ import { User } from 'lucide-react'
 import type { Person } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
+export type PersonNodeData = Person & { kinshipTerm?: string; isEgo?: boolean }
+
 function formatYears(person: Person) {
   const birth = person.birth_date ? person.birth_date.slice(0, 4) : '?'
   const death = person.death_date ? person.death_date.slice(0, 4) : ''
@@ -12,7 +14,7 @@ function formatYears(person: Person) {
   return death ? `${birth} - ${death}` : `${birth} -`
 }
 
-function PersonNodeImpl({ data, selected }: NodeProps<Person>) {
+function PersonNodeImpl({ data, selected }: NodeProps<PersonNodeData>) {
   const years = formatYears(data)
   return (
     <div
@@ -21,6 +23,7 @@ function PersonNodeImpl({ data, selected }: NodeProps<Person>) {
         selected ? 'border-primary ring-2 ring-ring' : 'border-border',
         data.gender === 'male' && 'border-l-4 border-l-sky-400',
         data.gender === 'female' && 'border-l-4 border-l-rose-400',
+        data.isEgo && 'ring-2 ring-amber-400',
       )}
     >
       <Handle type="target" position={Position.Top} className="!bg-muted-foreground" />
@@ -32,7 +35,13 @@ function PersonNodeImpl({ data, selected }: NodeProps<Person>) {
         )}
       </div>
       <div className="min-w-0 text-left">
-        <p className="truncate text-sm font-medium">{data.name}</p>
+        <p className="truncate text-sm font-medium">
+          {data.name}
+          {data.isEgo && <span className="ml-1 text-xs text-amber-500">(나)</span>}
+        </p>
+        {data.kinshipTerm && (
+          <p className="truncate text-xs font-medium text-primary">{data.kinshipTerm}</p>
+        )}
         {years && <p className="truncate text-xs text-muted-foreground">{years}</p>}
       </div>
       <Handle type="source" position={Position.Bottom} className="!bg-muted-foreground" />

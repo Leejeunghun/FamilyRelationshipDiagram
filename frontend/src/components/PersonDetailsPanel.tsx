@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Trash2, X } from 'lucide-react'
+import { Trash2, UserRound, X } from 'lucide-react'
 
 import { api } from '@/lib/api'
 import type { Person, RelativesResponse } from '@/lib/types'
@@ -17,6 +17,9 @@ interface Props {
   person: Person
   onClose: () => void
   onDeleted: () => void
+  isEgo: boolean
+  onSetEgo: () => void
+  onClearEgo: () => void
 }
 
 const SECTIONS: { key: keyof RelativesResponse; label: string }[] = [
@@ -29,7 +32,7 @@ const SECTIONS: { key: keyof RelativesResponse; label: string }[] = [
   { key: 'descendants', label: '자손' },
 ]
 
-export function PersonDetailsPanel({ person, onClose, onDeleted }: Props) {
+export function PersonDetailsPanel({ person, onClose, onDeleted, isEgo, onSetEgo, onClearEgo }: Props) {
   const [relatives, setRelatives] = useState<RelativesResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -65,6 +68,14 @@ export function PersonDetailsPanel({ person, onClose, onDeleted }: Props) {
         </Button>
       </CardHeader>
       <CardContent className="flex flex-col gap-3 text-left">
+        <Button
+          variant={isEgo ? 'default' : 'outline'}
+          size="sm"
+          onClick={isEgo ? onClearEgo : onSetEgo}
+        >
+          <UserRound className="h-4 w-4" />
+          {isEgo ? '나 지정 해제' : '이 사람을 나로 보기'}
+        </Button>
         {loading && <p className="text-sm text-muted-foreground">불러오는 중...</p>}
         {relatives &&
           SECTIONS.map(({ key, label }) => {

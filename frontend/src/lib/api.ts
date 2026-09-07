@@ -1,5 +1,6 @@
 import type {
   GraphResponse,
+  KinshipTerm,
   Person,
   PersonInput,
   RelationshipInput,
@@ -32,6 +33,7 @@ export const api = {
     request<void>('/relationships', { method: 'POST', body: JSON.stringify(data) }),
   deleteRelationship: (id: number) => request<void>(`/relationships/${id}`, { method: 'DELETE' }),
   getRelatives: (personId: number) => request<RelativesResponse>(`/people/${personId}/relatives`),
+  getKinshipTerms: (personId: number) => request<KinshipTerm[]>(`/people/${personId}/kinship-terms`),
   uploadPhoto: async (file: File): Promise<{ url: string }> => {
     const formData = new FormData()
     formData.append('file', file)

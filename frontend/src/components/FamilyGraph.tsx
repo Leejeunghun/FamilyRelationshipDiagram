@@ -20,9 +20,11 @@ const nodeTypes = { person: PersonNode }
 interface Props {
   refreshTrigger: number
   onSelectPerson: (person: Person) => void
+  egoPersonId?: number | null
+  kinshipTerms?: Record<number, string>
 }
 
-export function FamilyGraph({ refreshTrigger, onSelectPerson }: Props) {
+export function FamilyGraph({ refreshTrigger, onSelectPerson, egoPersonId, kinshipTerms }: Props) {
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [loading, setLoading] = useState(true)
@@ -60,6 +62,21 @@ export function FamilyGraph({ refreshTrigger, onSelectPerson }: Props) {
 
   const isEmpty = useMemo(() => !loading && !error && nodes.length === 0, [loading, error, nodes.length])
 
+  // 레이아웃(nodes)은 그래프가 바뀔 때만 다시 계산하고, 호칭/나 표시는
+  // 여기서 화면에 보여줄 데이터에만 얹어서 매번 레이아웃을 새로 계산하지 않는다.
+  const displayNodes = useMemo(
+    () =>
+      nodes.map((node) => ({
+        ...node,
+        data: {
+          ...node.data,
+          isEgo: egoPersonId != null && node.data.id === egoPersonId,
+          kinshipTerm: kinshipTerms?.[node.data.id],
+        },
+      })),
+    [nodes, egoPersonId, kinshipTerms],
+  )
+
   return (
     <div className="relative h-full w-full">
       {error && (
@@ -73,7 +90,7 @@ export function FamilyGraph({ refreshTrigger, onSelectPerson }: Props) {
         </div>
       )}
       <ReactFlow
-        nodes={nodes}
+        nodes={displayNodes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}

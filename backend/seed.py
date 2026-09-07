@@ -3,6 +3,8 @@
 사용법: backend 폴더에서 `python seed.py`
 """
 
+from datetime import date
+
 from app import models
 from app.database import Base, SessionLocal, engine
 
@@ -16,16 +18,33 @@ try:
     if db.query(models.Person).filter(models.Person.owner_id == SEED_OWNER_ID).count() > 0:
         print("이미 시드 데이터가 존재합니다. 초기화하려면 family_tree.db 파일을 삭제하세요.")
     else:
+        # 생년월일을 넣어두면 형/누나/작은아버지처럼 나이 순서가 필요한 호칭까지
+        # 확인할 수 있다 (자세한 내용은 app/relationships.py의 kinship_term 참고).
         people = {
             "조부": models.Person(owner_id=SEED_OWNER_ID, name="김할아버지", gender=models.Gender.male),
             "조모": models.Person(owner_id=SEED_OWNER_ID, name="이할머니", gender=models.Gender.female),
-            "부": models.Person(owner_id=SEED_OWNER_ID, name="김아버지", gender=models.Gender.male),
-            "모": models.Person(owner_id=SEED_OWNER_ID, name="박어머니", gender=models.Gender.female),
-            "삼촌": models.Person(owner_id=SEED_OWNER_ID, name="김삼촌", gender=models.Gender.male),
+            "부": models.Person(
+                owner_id=SEED_OWNER_ID, name="김아버지", gender=models.Gender.male, birth_date=date(1970, 1, 1)
+            ),
+            "모": models.Person(
+                owner_id=SEED_OWNER_ID, name="박어머니", gender=models.Gender.female, birth_date=date(1972, 4, 11)
+            ),
+            "삼촌": models.Person(
+                owner_id=SEED_OWNER_ID, name="김삼촌", gender=models.Gender.male, birth_date=date(1975, 6, 15)
+            ),
             "숙모": models.Person(owner_id=SEED_OWNER_ID, name="최숙모", gender=models.Gender.female),
-            "나": models.Person(owner_id=SEED_OWNER_ID, name="김나", gender=models.Gender.unknown),
-            "동생": models.Person(owner_id=SEED_OWNER_ID, name="김동생", gender=models.Gender.unknown),
-            "사촌": models.Person(owner_id=SEED_OWNER_ID, name="김사촌", gender=models.Gender.unknown),
+            "누나": models.Person(
+                owner_id=SEED_OWNER_ID, name="김누나", gender=models.Gender.female, birth_date=date(1997, 3, 10)
+            ),
+            "나": models.Person(
+                owner_id=SEED_OWNER_ID, name="김나", gender=models.Gender.male, birth_date=date(2000, 5, 1)
+            ),
+            "동생": models.Person(
+                owner_id=SEED_OWNER_ID, name="김동생", gender=models.Gender.male, birth_date=date(2003, 8, 20)
+            ),
+            "사촌": models.Person(
+                owner_id=SEED_OWNER_ID, name="김사촌", gender=models.Gender.female, birth_date=date(2001, 1, 1)
+            ),
         }
         db.add_all(people.values())
         db.commit()
@@ -59,6 +78,8 @@ try:
         pc("조모", "삼촌")
 
         sp("부", "모")
+        pc("부", "누나")
+        pc("모", "누나")
         pc("부", "나")
         pc("모", "나")
         pc("부", "동생")

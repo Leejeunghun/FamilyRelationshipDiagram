@@ -68,3 +68,8 @@ class RelativesResponse(BaseModel):
     ancestors: list[PersonRead]
     descendants: list[PersonRead]
     cousins: list[PersonRead]
+
+
+class KinshipTermRead(BaseModel):
+    person: PersonRead
+    term: str
